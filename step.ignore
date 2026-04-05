@@ -33,4 +33,4 @@
 30 - Eu finalmente instalei o Postman para testar a API, estamos se aproximando da conclusão do backend
 31 - Criar os reports - Parte majoritariamente feita por AI, já que são diversas queries ORM e nada muito novo em relação ao que já foi feito até agora
 ----- CHECKPOINT ----- Daqui para frente, o foco é no FRONT
-32 - Usar npm install "react-router-dom" & "npm install @heroicons/react"
+32 - Usar "npm install react-router-dom" & "npm install @heroicons/react"

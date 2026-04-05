@@ -12,6 +12,8 @@ export default defineConfig({
     ],
     server: {
         watch: {
+            cors: true, //cors vive dando problema, espero que isso solucione
+            strictPort: false,
             ignored: ['**/storage/framework/views/**'],
         },
     },
