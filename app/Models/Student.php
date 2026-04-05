@@ -9,7 +9,7 @@ class Student extends Model
 {
     protected $fillable = ['name', 'email', 'phone'];
     
-    public function enrollments(): HasMany
+    public function enrollments(): HasMany //Um estudante pode ter multiplas matriculas
     {
         return $this->hasMany(Enrollment::class);
     }
