@@ -1,2 +1,2 @@
-# CRUD - Ranhento-Idiomas
+# CRUD - Ranhentos-Idiomas
 
