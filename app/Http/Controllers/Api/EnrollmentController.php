@@ -9,7 +9,7 @@ use App\Models\Course;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\Rule;
-
+//
 class EnrollmentController extends Controller
 {
     /**
@@ -55,6 +55,12 @@ class EnrollmentController extends Controller
         ]);
         $studentExists = false; //Variavel de controle para caso o try abaixo retorne model not found
         // Regras de negócio adicionais
+        // Não permitir matrícula duplicada (mesmo aluno + mesmo curso com status active)
+        // Verificar vagas do curso baseado em max_students
+        // Impedir cancelar matrícula já concluída
+        // Impedir concluir matrícula cancelada
+        //Impedir deletar matrícula concluída
+        //Validar data de início (não pode ser anterior a hoje)
         try {
             // Verificar se o aluno já está matriculado neste curso com status active
             $existingEnrollment = Enrollment::where('student_id', $validated['student_id'])

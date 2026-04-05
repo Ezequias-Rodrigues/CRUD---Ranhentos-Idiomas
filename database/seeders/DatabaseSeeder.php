@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             StudentSeeder::class,
             CourseSeeder::class,
+            EnrollmentSeeder::class, // Adicionar este
         ]);
     }
 }
