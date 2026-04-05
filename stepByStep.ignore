@@ -1,6 +1,0 @@
-1 - Instalar PHP, versão 8.5.4 instalada
-2 - Instalar Composer - versão 2.9.5 instalada 
-3 - Instalar Git - versão 2.53.0.2 instalada
-4 - Instalar  7-zip, versão 26.00 #Versionamento semantico que se dane KKKKK
-5 - Modificar php.ini, removendo o ; de extension=fileinfo (Use ctrl+f para achar)
-6 - Usar "composer create-project laravel/laravel "CRUD - Ranhento-Idiomas"" & "cd "CRUD - Ranhento-Idiomas" para criar o projeto laravel 
