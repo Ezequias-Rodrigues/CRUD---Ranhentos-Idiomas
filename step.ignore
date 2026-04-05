@@ -1,0 +1,36 @@
+1 - Instalar PHP, versão 8.5.4 instalada
+2 - Instalar Composer - versão 2.9.5 instalada
+3 - Instalar Git - versão 2.53.0.2 instalada
+4 - Instalar  7-zip, versão 26.00 #Versionamento semantico que se dane KKKKK
+5 - Modificar php.ini, removendo o ; de extension=fileinfo, pdo_sqlite(por enquanto usarei o sqlite, mais confortavel), pdo_mysql.  (Use ctrl+f para achar)
+6 - Usar "composer create-project laravel/laravel "CRUD - Ranhentos-Idiomas"" & "cd "CRUD - Ranhentos-Idiomas" para criar o projeto laravel
+7 - Usar "php artisan migrate" - Isso cria as migrações do banco de dados, acredito que vou entender isso melhor mais para frente
+8 - Usar "php artisan serve", aparentemente isso cria um webserver na porta 8000 (Seria isso tipo o express?)
+    8.1 - O site default é bonitinho, mas é basicamente um AD para o serviço de host deles kkkk
+9 - Usar "php artisan make:migration create_students_table" & "php artisan make:migration create_courses_table" & "php artisan make:migration create_enrollments_table" para criar as migrations
+10 - Aparentemente esses arquivos migrations possuem a schema da tabela, devo editar eles para que seja criado a tabela conforme o pedido
+11 - Usar "php artisan migrate" - Isso parece ser tipo executar uma query SQL
+12 - Usar "php artisan make:model Student" & "php artisan make:model Course" & "php artisan make:model Enrollment" para criar os modelos, estou razoavelmente familiarizado com esse "padrão", é um jeito de criar um objeto com os dados da row do DB
+13 - Usar "php artisan make:seeder StudentSeeder" & "php artisan make:seeder CourseSeeder" & "php artisan make:seeder EnrollmentSeeder" para criar os dados falsos para testes
+14 - Editar o DatabaseSeeder.php(depois de editar os arquivos criados pelo comando anterior), para que ele chame os arquivos editados
+15 - Usar "php artisan db:seed" para chamar o DatabaseSeeder
+    15.1 Aqui eu fiz algo de errado, rodei o comando a cima e ele retornou que Students não tinha a coluna "name", ao verificar com DB browser, realmente não havia essa coluna nem as outras. Usei "php artisan migrate:fresh" para começar do zero, afinal não tinha dados importantes lá
+16 - Usar "php artisan make:controller Api/StudentController --api" & "php artisan make:controller Api/CourseController --api" & "php artisan make:controller Api/EnrollmentController --api" & "php artisan make:controller Api/ReportController" para criar os controladores da API
+17 - Acredito que eu deveria modificar TODOS os controladores além do StudentController, porém eu to usando auxilio da IA, e ela deixou isso de lado por enquanto, vou deixar um #TODO aqui para que eu não esqueça, se ela esquecer
+18 - Prosseguindo... Configurar as rotas da API, pelo que entendi, posso atribuir uma classe a uma string identificadora, deduzindo pelo contexto, eu vou poder acessar isso atraves de algo tipo localhost:8000/students. route.get.... Ok isso aqui definitivamente me lembra o express
+    18.1 Adicionar "api: __DIR__.'/../routes/api.php'," ao arquivo /bootstrap/app.php, e rodar "php artisan install:api"... Laravel 11 não usa o arquivo api.php por padrão... (Levei um bom tempo quebrando a cabeça com 404s...)
+19 - Instalar o NPM... vamos criar algo visivel
+20 - Instalar as dependencias do NPM com "npm install"
+21 - Instalar axios e react-router-dom com "npm install axios react-router-dom"
+22 - Instalar o Tailwind, postcss e autoprefixer com "npm install -D tailwindcss postcss autoprefixer", não é necessário MAAAAAS eu tenho que entregar isso o quanto antes, e eu não domino CSS.
+23 - Lavarel já instala o Vite, então é só incluir o Tailwind ali... Eu não chequei o arquivo antes, mas aparentemente ele já foi gerado com o tailwind? ???????
+24 - Adicionar @tailwind utilities; ao arquivo /resources/css/app.css
+25 - Criar um componente, StudenttList, para testar o front
+26 - Por ele no App.jsx para ser visivel
+27 - Configurar/Criar o config/cors.php para permitir cross origin
+28 - Criar controladores para course e enrollment
+29 - Ajustar o api.php para apontar para os controladores de Enrollment
+30 - Eu finalmente instalei o Postman para testar a API, estamos se aproximando da conclusão do backend
+31 - Criar os reports - Parte majoritariamente feita por AI, já que são diversas queries ORM e nada muito novo em relação ao que já foi feito até agora
+----- CHECKPOINT ----- Daqui para frente, o foco é no FRONT
+32 - Usar npm install "react-router-dom" & "npm install @heroicons/react"

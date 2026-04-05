@@ -16,9 +16,9 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            StudentSeeder::class,
+            StudentSeeder::class, //Popula o DB com dados falsos
             CourseSeeder::class,
-            EnrollmentSeeder::class, // Adicionar este
+            EnrollmentSeeder::class, //
         ]);
     }
 }
