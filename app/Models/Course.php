@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Course extends Model
 {
-    protected $fillable = ['name', 'description', 'price', 'max_students'];
+    protected $fillable = ['name', 'description', 'price', 'duration', 'max_students'];
     
     public function enrollments(): HasMany //Um curso pode ter muitas matriculas
     {

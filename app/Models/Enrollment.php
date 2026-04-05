@@ -13,7 +13,7 @@ class Enrollment extends Model
         'start_date' => 'date',
     ];
     
-    public function student(): BelongsTo
+    public function student(): BelongsTo //"Quem tem a chave estrangeira, usa BelongsTo" - Seek, Deep - 2026
     {
         return $this->belongsTo(Student::class); //Essa matricula pertence a um estudante
     }
