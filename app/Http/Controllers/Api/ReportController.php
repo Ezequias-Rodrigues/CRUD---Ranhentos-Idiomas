@@ -129,7 +129,7 @@ class ReportController extends Controller
 
                 $report[] = [
                     'course_id' => $course->id,
-                    'course_name' => $course->name,  
+                    'course_name' => $course->name,
                     'course_price' => (float) $course->price,
                     'total_revenue' => (float) $totalRevenue,
                     'total_enrollments' => $totalEnrollments,
