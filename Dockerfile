@@ -2,16 +2,11 @@ FROM php:8.4-apache
 
 # Instalar dependências do sistema
 RUN apt-get update && apt-get install -y \
-    libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
     libzip-dev \
     unzip \
     git \
     curl \
-    libonig-dev \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd pdo pdo_mysql zip mbstring
+    && docker-php-ext-install pdo pdo_mysql zip
 
 # Instalar Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -28,25 +23,24 @@ WORKDIR /var/www/html
 # Copiar arquivos do projeto
 COPY . .
 
-# Criar arquivo .env se não existir (para produção)
-#RUN if [ ! -f .env ]; then cp .env.example .env; fi #Linha problemática que deixei passar sem ver, não tenho .env.example
+# Criar pastas necessárias
+RUN mkdir -p storage/framework/sessions
+RUN mkdir -p storage/framework/views
+RUN mkdir -p storage/framework/cache
+RUN mkdir -p bootstrap/cache
 
-# Instalar dependências PHP
-RUN composer install --no-dev --optimize-autoloader --no-interaction --ignore-platform-req=ext-exif
+# Permissões (mais permissivas para debug)
+RUN chmod -R 777 storage
+RUN chmod -R 777 bootstrap/cache
+RUN chown -R www-data:www-data /var/www/html
 
-# Configurar permissões
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html/storage \
-    && chmod -R 755 /var/www/html/bootstrap/cache
+# Instalar dependências
+RUN composer install --no-interaction --ignore-platform-req=ext-exif --ignore-platform-req=php
 
-# Criar link simbólico para storage
-RUN php artisan storage:link || true
-
-# Otimizar Laravel
-RUN php artisan config:cache || true
-RUN php artisan route:cache || true
-RUN php artisan view:cache || true
+# Configurar .env básico
+RUN echo "APP_ENV=production" > .env
+RUN echo "APP_DEBUG=true" >> .env
+RUN echo "APP_KEY=base64:$(openssl rand -base64 32)" >> .env
 
 EXPOSE 80
-
 CMD ["apache2-foreground"]
