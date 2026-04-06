@@ -4,9 +4,9 @@ import ReactDOM from 'react-dom/client';
 import Layout from './components/Layout';
 import StudentList from './components/StudentList';
 import CourseList from "./components/CourseList.jsx";
+import EnrollmentList from './components/EnrollmentList';
+import Reports from './components/Reports';
 
-const EnrollmentsList = () => <div className="text-center py-8">Página de Matrículas</div>;
-const ReportsPage = () => <div className="text-center py-8">Página de Relatórios</div>;
 
 function App() {
     return (
@@ -16,8 +16,8 @@ function App() {
                     <Route path="/" element={<Navigate to="/students" replace />} />
                     <Route path="/students" element={<StudentList />} />
                     <Route path="/courses" element={<CourseList />} />
-                    <Route path="/enrollments" element={<EnrollmentsList />} />
-                    <Route path="/reports" element={<ReportsPage />} />
+                    <Route path="/enrollments" element={<EnrollmentList />} />
+                    <Route path="/reports" element={<Reports />} />
                 </Routes>
             </Layout>
         </Router>
