@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
-import { Bar, Pie, Line } from 'react-chartjs-2';
+import { Bar, Pie } from 'react-chartjs-2';
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -10,8 +10,6 @@ import {
     Tooltip,
     Legend,
     ArcElement,
-    PointElement,
-    LineElement
 } from 'chart.js';
 
 // Registrar componentes do Chart.js
@@ -22,9 +20,7 @@ ChartJS.register(
     Title,
     Tooltip,
     Legend,
-    ArcElement,
-    PointElement,
-    LineElement
+    ArcElement
 );
 
 function Reports() {
@@ -33,24 +29,47 @@ function Reports() {
     const [investmentData, setInvestmentData] = useState([]);
     const [popularCourses, setPopularCourses] = useState([]);
     const [revenueData, setRevenueData] = useState([]);
-    const [summary, setSummary] = useState({});
+    const [summary, setSummary] = useState({
+        total_students: 0,
+        total_courses: 0,
+        total_revenue: 0
+    });
 
     // Carregar todos os relatórios
     const loadReports = async () => {
         setLoading(true);
         try {
-            const [investmentRes, popularRes, revenueRes] = await Promise.all([
-                api.get('/reports/investment-per-student'),
-                api.get('/reports/popular-courses'),
-                api.get('/reports/revenue-per-course')
-            ]);
+            // Buscar cada relatório individualmente
+            const investmentRes = await api.get('/reports/investment-per-student');
+            const popularRes = await api.get('/reports/popular-courses');
+            const revenueRes = await api.get('/reports/revenue-per-course');
 
-            setInvestmentData(investmentRes.data.data || []);
-            setPopularCourses(popularRes.data.data || []);
-            setRevenueData(revenueRes.data.data || []);
-            setSummary(investmentRes.data.summary || {});
+            console.log('Investment Response:', investmentRes.data);
+            console.log('Popular Response:', popularRes.data);
+            console.log('Revenue Response:', revenueRes.data);
+
+            // Extrair os dados corretamente
+            // A API retorna { success: true, data: [...], summary: {...} }
+            const investment = investmentRes.data.data || [];
+            const popular = popularRes.data.data || [];
+            const revenue = revenueRes.data.data || [];
+
+            setInvestmentData(investment);
+            setPopularCourses(popular);
+            setRevenueData(revenue);
+
+            // Extrair summary do primeiro relatório ou criar padrão
+            if (investmentRes.data.summary) {
+                setSummary({
+                    total_students: investmentRes.data.summary.total_students || 0,
+                    total_courses: popularRes.data.summary?.total_courses || 0,
+                    total_revenue: revenueRes.data.summary?.total_revenue_all || 0
+                });
+            }
+
             setError(null);
         } catch (err) {
+            console.error('Erro detalhado:', err);
             setError('Erro ao carregar relatórios: ' + (err.response?.data?.message || err.message));
         } finally {
             setLoading(false);
@@ -61,55 +80,50 @@ function Reports() {
         loadReports();
     }, []);
 
-    // Configuração do gráfico de investimento por aluno (Bar)
+    // Formatar preço
+    const formatPrice = (price) => {
+        if (!price && price !== 0) return 'R$ 0,00';
+        return new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
+        }).format(price);
+    };
+
+    // Configuração do gráfico de investimento por aluno
     const investmentChartData = {
-        labels: investmentData.map(item => item.student_name),
+        labels: investmentData.map(item => item.student_name || 'Sem nome'),
         datasets: [
             {
                 label: 'Total Investido (R$)',
-                data: investmentData.map(item => item.total_invested),
+                data: investmentData.map(item => item.total_invested || 0),
                 backgroundColor: 'rgba(54, 162, 235, 0.6)',
                 borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1,
-            },
-            {
-                label: 'Média por Curso (R$)',
-                data: investmentData.map(item => item.total_courses > 0 ? item.total_invested / item.total_courses : 0),
-                backgroundColor: 'rgba(255, 99, 132, 0.6)',
-                borderColor: 'rgba(255, 99, 132, 1)',
                 borderWidth: 1,
             }
         ],
     };
 
-    // Configuração do gráfico de cursos populares (Bar)
+    // Configuração do gráfico de cursos populares
     const popularCoursesChartData = {
-        labels: popularCourses.map(item => item.name),
+        labels: popularCourses.map(item => item.name || 'Sem nome'),
         datasets: [
             {
                 label: 'Total de Matrículas',
-                data: popularCourses.map(item => item.total_enrollments),
+                data: popularCourses.map(item => item.total_enrollments || 0),
                 backgroundColor: 'rgba(75, 192, 192, 0.6)',
                 borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 1,
-            },
-            {
-                label: 'Matrículas Ativas',
-                data: popularCourses.map(item => item.active_enrollments),
-                backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                borderColor: 'rgba(54, 162, 235, 1)',
                 borderWidth: 1,
             }
         ],
     };
 
-    // Configuração do gráfico de faturamento (Pie)
+    // Configuração do gráfico de faturamento
     const revenueChartData = {
-        labels: revenueData.map(item => item.course_name),
+        labels: revenueData.map(item => item.course_name || 'Sem nome'),
         datasets: [
             {
-                label: 'Faturamento Total (R$)',
-                data: revenueData.map(item => item.total_revenue),
+                label: 'Faturamento (R$)',
+                data: revenueData.map(item => item.total_revenue || 0),
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.6)',
                     'rgba(54, 162, 235, 0.6)',
@@ -137,12 +151,6 @@ function Reports() {
             legend: {
                 position: 'top',
             },
-            title: {
-                display: true,
-                font: {
-                    size: 16
-                }
-            },
             tooltip: {
                 callbacks: {
                     label: function(context) {
@@ -150,17 +158,8 @@ function Reports() {
                         if (label) {
                             label += ': ';
                         }
-                        if (context.parsed.y !== undefined) {
-                            label += new Intl.NumberFormat('pt-BR', {
-                                style: 'currency',
-                                currency: 'BRL'
-                            }).format(context.parsed.y);
-                        } else if (context.parsed !== undefined) {
-                            label += new Intl.NumberFormat('pt-BR', {
-                                style: 'currency',
-                                currency: 'BRL'
-                            }).format(context.parsed);
-                        }
+                        const value = context.raw || context.parsed || 0;
+                        label += formatPrice(value);
                         return label;
                     }
                 }
@@ -171,10 +170,7 @@ function Reports() {
                 beginAtZero: true,
                 ticks: {
                     callback: function(value) {
-                        return new Intl.NumberFormat('pt-BR', {
-                            style: 'currency',
-                            currency: 'BRL'
-                        }).format(value);
+                        return formatPrice(value);
                     }
                 }
             }
@@ -188,38 +184,18 @@ function Reports() {
             legend: {
                 position: 'top',
             },
-            title: {
-                display: true,
-                font: {
-                    size: 16
-                }
-            },
             tooltip: {
                 callbacks: {
                     label: function(context) {
                         const label = context.label || '';
-                        const value = context.parsed || 0;
+                        const value = context.raw || context.parsed || 0;
                         const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                        const percentage = ((value / total) * 100).toFixed(1);
-                        return `${label}: ${new Intl.NumberFormat('pt-BR', {
-                            style: 'currency',
-                            currency: 'BRL'
-                        }).format(value)} (${percentage}%)`;
+                        const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                        return `${label}: ${formatPrice(value)} (${percentage}%)`;
                     }
                 }
             }
         }
-    };
-
-    const formatPrice = (price) => {
-        return new Intl.NumberFormat('pt-BR', {
-            style: 'currency',
-            currency: 'BRL'
-        }).format(price);
-    };
-
-    const formatDate = (date) => {
-        return new Date(date).toLocaleDateString('pt-BR');
     };
 
     if (loading) {
@@ -234,7 +210,13 @@ function Reports() {
         return (
             <div className="p-4">
                 <div className="p-3 bg-red-100 text-red-700 rounded-lg border border-red-200">
-                    {error}
+                    <strong>Erro:</strong> {error}
+                    <button
+                        onClick={loadReports}
+                        className="ml-4 px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+                    >
+                        Tentar novamente
+                    </button>
                 </div>
             </div>
         );
@@ -246,17 +228,19 @@ function Reports() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg p-6 shadow-lg">
                     <div className="text-sm uppercase tracking-wide">Total de Alunos</div>
-                    <div className="text-3xl font-bold mt-2">{summary.total_students || 0}</div>
+                    <div className="text-3xl font-bold mt-2">{summary.total_students || investmentData.length || 0}</div>
                     <div className="text-sm mt-2 opacity-80">Alunos cadastrados</div>
                 </div>
                 <div className="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg p-6 shadow-lg">
                     <div className="text-sm uppercase tracking-wide">Total de Cursos</div>
-                    <div className="text-3xl font-bold mt-2">{summary.total_courses || 0}</div>
+                    <div className="text-3xl font-bold mt-2">{summary.total_courses || popularCourses.length || 0}</div>
                     <div className="text-sm mt-2 opacity-80">Cursos disponíveis</div>
                 </div>
                 <div className="bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg p-6 shadow-lg">
                     <div className="text-sm uppercase tracking-wide">Faturamento Total</div>
-                    <div className="text-3xl font-bold mt-2">{formatPrice(summary.total_revenue || 0)}</div>
+                    <div className="text-3xl font-bold mt-2">
+                        {formatPrice(revenueData.reduce((sum, item) => sum + (item.total_revenue || 0), 0))}
+                    </div>
                     <div className="text-sm mt-2 opacity-80">Receita total</div>
                 </div>
             </div>
@@ -269,16 +253,7 @@ function Reports() {
                 {investmentData.length > 0 ? (
                     <>
                         <div className="h-96">
-                            <Bar data={investmentChartData} options={{
-                                ...chartOptions,
-                                plugins: {
-                                    ...chartOptions.plugins,
-                                    title: {
-                                        ...chartOptions.plugins.title,
-                                        text: 'Investimento por Aluno'
-                                    }
-                                }
-                            }} />
+                            <Bar data={investmentChartData} options={chartOptions} />
                         </div>
                         <div className="mt-6 overflow-x-auto">
                             <table className="min-w-full">
@@ -293,13 +268,13 @@ function Reports() {
                                 <tbody className="divide-y divide-gray-200">
                                 {investmentData.map((item, index) => (
                                     <tr key={index} className="hover:bg-gray-50">
-                                        <td className="px-4 py-2 text-sm text-gray-900">{item.student_name}</td>
+                                        <td className="px-4 py-2 text-sm text-gray-900">{item.student_name || 'N/A'}</td>
                                         <td className="px-4 py-2 text-sm text-right font-semibold text-green-600">
                                             {formatPrice(item.total_invested)}
                                         </td>
-                                        <td className="px-4 py-2 text-sm text-right">{item.total_courses}</td>
+                                        <td className="px-4 py-2 text-sm text-right">{item.total_courses || 0}</td>
                                         <td className="px-4 py-2 text-sm text-right">
-                                            {formatPrice(item.total_invested / item.total_courses)}
+                                            {formatPrice((item.total_invested || 0) / (item.total_courses || 1))}
                                         </td>
                                     </tr>
                                 ))}
@@ -308,7 +283,7 @@ function Reports() {
                         </div>
                     </>
                 ) : (
-                    <p className="text-gray-500 text-center py-8">Nenhum dado disponível</p>
+                    <p className="text-gray-500 text-center py-8">Nenhum dado disponível. Crie algumas matrículas para ver os relatórios.</p>
                 )}
             </div>
 
@@ -320,16 +295,7 @@ function Reports() {
                 {popularCourses.length > 0 ? (
                     <>
                         <div className="h-96">
-                            <Bar data={popularCoursesChartData} options={{
-                                ...chartOptions,
-                                plugins: {
-                                    ...chartOptions.plugins,
-                                    title: {
-                                        ...chartOptions.plugins.title,
-                                        text: 'Popularidade dos Cursos'
-                                    }
-                                }
-                            }} />
+                            <Bar data={popularCoursesChartData} options={chartOptions} />
                         </div>
                         <div className="mt-6 overflow-x-auto">
                             <table className="min-w-full">
@@ -340,20 +306,16 @@ function Reports() {
                                     <th className="px-4 py-2 text-right text-sm font-medium text-gray-500">Ativas</th>
                                     <th className="px-4 py-2 text-right text-sm font-medium text-gray-500">Concluídas</th>
                                     <th className="px-4 py-2 text-right text-sm font-medium text-gray-500">Canceladas</th>
-                                    <th className="px-4 py-2 text-right text-sm font-medium text-gray-500">Ocupação</th>
                                 </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-200">
                                 {popularCourses.map((course, index) => (
                                     <tr key={index} className="hover:bg-gray-50">
-                                        <td className="px-4 py-2 text-sm text-gray-900">{course.name}</td>
-                                        <td className="px-4 py-2 text-sm text-right font-semibold">{course.total_enrollments}</td>
-                                        <td className="px-4 py-2 text-sm text-right text-green-600">{course.active_enrollments}</td>
-                                        <td className="px-4 py-2 text-sm text-right text-blue-600">{course.completed_enrollments}</td>
-                                        <td className="px-4 py-2 text-sm text-right text-red-600">{course.cancelled_enrollments}</td>
-                                        <td className="px-4 py-2 text-sm text-right">
-                                            {course.occupancy_percentage ? `${course.occupancy_percentage}%` : 'Ilimitado'}
-                                        </td>
+                                        <td className="px-4 py-2 text-sm text-gray-900">{course.name || 'N/A'}</td>
+                                        <td className="px-4 py-2 text-sm text-right font-semibold">{course.total_enrollments || 0}</td>
+                                        <td className="px-4 py-2 text-sm text-right text-green-600">{course.active_enrollments || 0}</td>
+                                        <td className="px-4 py-2 text-sm text-right text-blue-600">{course.completed_enrollments || 0}</td>
+                                        <td className="px-4 py-2 text-sm text-right text-red-600">{course.cancelled_enrollments || 0}</td>
                                     </tr>
                                 ))}
                                 </tbody>
@@ -361,7 +323,7 @@ function Reports() {
                         </div>
                     </>
                 ) : (
-                    <p className="text-gray-500 text-center py-8">Nenhum dado disponível</p>
+                    <p className="text-gray-500 text-center py-8">Nenhum dado disponível. Crie algumas matrículas para ver os relatórios.</p>
                 )}
             </div>
 
@@ -388,13 +350,13 @@ function Reports() {
                                 <tbody className="divide-y divide-gray-200">
                                 {revenueData.map((course, index) => (
                                     <tr key={index} className="hover:bg-gray-50">
-                                        <td className="px-4 py-2 text-sm text-gray-900">{course.course_name}</td>
+                                        <td className="px-4 py-2 text-sm text-gray-900">{course.course_name || 'N/A'}</td>
                                         <td className="px-4 py-2 text-sm text-right font-semibold text-green-600">
                                             {formatPrice(course.total_revenue)}
                                         </td>
-                                        <td className="px-4 py-2 text-sm text-right">{course.total_enrollments}</td>
+                                        <td className="px-4 py-2 text-sm text-right">{course.total_enrollments || 0}</td>
                                         <td className="px-4 py-2 text-sm text-right">
-                                            {formatPrice(course.average_ticket)}
+                                            {formatPrice(course.average_ticket || 0)}
                                         </td>
                                     </tr>
                                 ))}
@@ -403,10 +365,10 @@ function Reports() {
                                 <tr>
                                     <td className="px-4 py-2 text-sm">Total Geral</td>
                                     <td className="px-4 py-2 text-sm text-right text-green-700">
-                                        {formatPrice(revenueData.reduce((sum, item) => sum + item.total_revenue, 0))}
+                                        {formatPrice(revenueData.reduce((sum, item) => sum + (item.total_revenue || 0), 0))}
                                     </td>
                                     <td className="px-4 py-2 text-sm text-right">
-                                        {revenueData.reduce((sum, item) => sum + item.total_enrollments, 0)}
+                                        {revenueData.reduce((sum, item) => sum + (item.total_enrollments || 0), 0)}
                                     </td>
                                     <td className="px-4 py-2 text-sm text-right"></td>
                                 </tr>
@@ -415,7 +377,7 @@ function Reports() {
                         </div>
                     </div>
                 ) : (
-                    <p className="text-gray-500 text-center py-8">Nenhum dado disponível</p>
+                    <p className="text-gray-500 text-center py-8">Nenhum dado disponível. Crie algumas matrículas para ver os relatórios.</p>
                 )}
             </div>
         </div>
