@@ -1,5 +1,4 @@
-# Usar imagem oficial do PHP com Apache
-FROM php:8.2-apache
+FROM php:8.3-apache
 
 # Instalar dependências do sistema
 RUN apt-get update && apt-get install -y \
@@ -10,8 +9,9 @@ RUN apt-get update && apt-get install -y \
     unzip \
     git \
     curl \
+    libonig-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd pdo pdo_mysql zip
+    && docker-php-ext-install gd pdo pdo_mysql zip mbstring
 
 # Instalar Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -28,8 +28,11 @@ WORKDIR /var/www/html
 # Copiar arquivos do projeto
 COPY . .
 
+# Criar arquivo .env se não existir (para produção)
+RUN if [ ! -f .env ]; then cp .env.example .env; fi
+
 # Instalar dependências PHP
-RUN composer install --no-dev --optimize-autoloader --no-interaction
+RUN composer install --no-dev --optimize-autoloader --no-interaction --ignore-platform-req=ext-exif
 
 # Configurar permissões
 RUN chown -R www-data:www-data /var/www/html \
@@ -39,13 +42,11 @@ RUN chown -R www-data:www-data /var/www/html \
 # Criar link simbólico para storage
 RUN php artisan storage:link || true
 
-# Expor porta 80
+# Otimizar Laravel
+RUN php artisan config:cache || true
+RUN php artisan route:cache || true
+RUN php artisan view:cache || true
+
 EXPOSE 80
 
-# Script de entrada
-COPY docker-entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
-ENTRYPOINT ["docker-entrypoint.sh"]
-
-# Comando padrão
 CMD ["apache2-foreground"]
