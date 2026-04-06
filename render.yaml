@@ -1,0 +1,39 @@
+services:
+  - type: web
+    name: ranhentos-idiomas-api
+    runtime: image
+    repo: https://github.com/Ezequias-Rodrigues/CRUD---Ranhentos-Idiomas
+    plan: free
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_KEY
+        generateValue: true
+      - key: DB_CONNECTION
+        value: mysql
+      - key: DB_HOST
+        fromDatabase:
+          name: ranhentos-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: ranhentos-db
+          property: port
+      - key: DB_DATABASE
+        fromDatabase:
+          name: ranhentos-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: ranhentos-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: ranhentos-db
+          property: password
+
+databases:
+  - name: ranhentos-db
+    plan: free
