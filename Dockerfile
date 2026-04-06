@@ -20,7 +20,7 @@ RUN a2enmod rewrite
 # Configurar diretório de trabalho
 WORKDIR /var/www/html
 
-# Copiar arquivos do projeto
+# Copiar arquivos do proj
 COPY . .
 
 # Criar pastas necessárias
@@ -34,13 +34,17 @@ RUN chmod -R 777 storage
 RUN chmod -R 777 bootstrap/cache
 RUN chown -R www-data:www-data /var/www/html
 
-# Instalar dependências
-RUN composer install --no-interaction --ignore-platform-req=ext-exif --ignore-platform-req=php
-
 # Configurar .env básico
 RUN echo "APP_ENV=production" > .env
 RUN echo "APP_DEBUG=true" >> .env
-RUN echo "APP_KEY=base64:$(openssl rand -base64 32)" >> .env
+
+
+# Instalar dependências
+RUN composer install --no-interaction --ignore-platform-req=ext-exif --ignore-platform-req=php
+
+#Limpando...
+RUN php artisan config:clear || true
+RUN php artisan cache:clear || true
 
 EXPOSE 80
 CMD ["apache2-foreground"]
