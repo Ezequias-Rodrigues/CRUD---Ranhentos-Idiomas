@@ -38,6 +38,8 @@ RUN chown -R www-data:www-data /var/www/html
 RUN echo "APP_ENV=production" > .env
 RUN echo "APP_DEBUG=true" >> .env
 
+# Garantir que o arquivo de log existe e tem permissão
+RUN touch storage/logs/laravel.log && chmod 666 storage/logs/laravel.log
 
 # Instalar dependências
 RUN composer install --no-interaction --ignore-platform-req=ext-exif --ignore-platform-req=php
@@ -46,5 +48,7 @@ RUN composer install --no-interaction --ignore-platform-req=ext-exif --ignore-pl
 RUN php artisan config:clear || true
 RUN php artisan cache:clear || true
 
+# Garantir que o usuário do Apache tem permissão
+RUN chown -R www-data:www-data /var/www/html
 EXPOSE 80
 CMD ["apache2-foreground"]
