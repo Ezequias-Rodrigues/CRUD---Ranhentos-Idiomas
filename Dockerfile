@@ -6,7 +6,9 @@ RUN apt-get update && apt-get install -y \
     unzip \
     git \
     curl \
-    && docker-php-ext-install pdo pdo_mysql zip
+    ca-certificates \
+    && docker-php-ext-install pdo pdo_mysql zip \
+    && update-ca-certificates
 
 # Instalar Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -23,32 +25,19 @@ WORKDIR /var/www/html
 # Copiar arquivos do proj
 COPY . .
 
-# Criar pastas necessárias
-RUN mkdir -p storage/framework/sessions
-RUN mkdir -p storage/framework/views
-RUN mkdir -p storage/framework/cache
-RUN mkdir -p bootstrap/cache
-
-# Permissões (mais permissivas para debug)
-RUN chmod -R 777 storage
-RUN chmod -R 777 bootstrap/cache
-RUN chown -R www-data:www-data /var/www/html
-
-# Configurar .env básico
-RUN echo "APP_ENV=production" > .env
-RUN echo "APP_DEBUG=true" >> .env
-
-# Garantir que o arquivo de log existe e tem permissão
+# Criar pastas
+RUN mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache storage/logs bootstrap/cache
+RUN chmod -R 777 storage bootstrap/cache
 RUN touch storage/logs/laravel.log && chmod 666 storage/logs/laravel.log
 
 # Instalar dependências
 RUN composer install --no-interaction --ignore-platform-req=ext-exif --ignore-platform-req=php
 
-#Limpando...
+# Limpar cache
 RUN php artisan config:clear || true
 RUN php artisan cache:clear || true
 
-# Garantir que o usuário do Apache tem permissão
 RUN chown -R www-data:www-data /var/www/html
+
 EXPOSE 80
 CMD ["apache2-foreground"]
