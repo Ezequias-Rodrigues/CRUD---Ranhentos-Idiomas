@@ -4,6 +4,7 @@ services:
     runtime: image
     repo: https://github.com/Ezequias-Rodrigues/CRUD---Ranhentos-Idiomas
     plan: free
+    dockerfilePath: ./Dockerfile
     envVars:
       - key: APP_ENV
         value: production
@@ -14,26 +15,12 @@ services:
       - key: DB_CONNECTION
         value: mysql
       - key: DB_HOST
-        fromDatabase:
-          name: ranhentos-db
-          property: host
+        value: sql.freedb.tech
       - key: DB_PORT
-        fromDatabase:
-          name: ranhentos-db
-          property: port
+        value: 3306
       - key: DB_DATABASE
-        fromDatabase:
-          name: ranhentos-db
-          property: database
+        value: freedb_ranhentos_idiomas
       - key: DB_USERNAME
-        fromDatabase:
-          name: ranhentos-db
-          property: user
+        value: freedb_ranhentos_user
       - key: DB_PASSWORD
-        fromDatabase:
-          name: ranhentos-db
-          property: password
-
-databases:
-  - name: ranhentos-db
-    plan: free
+        value: a&9N5@qqUkS9fMJ

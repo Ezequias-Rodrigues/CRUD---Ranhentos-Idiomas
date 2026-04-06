@@ -35,3 +35,12 @@
 ----- CHECKPOINT ----- Daqui para frente, o foco é no FRONT
 32 - Usar "npm install react-router-dom" & "npm install @heroicons/react"
 33 - Usar "npm install chart.js react-chartjs-2" para criar os gráficos
+--- CHECKPOINT ----- Deploy
+34 - Usar "npm install -g vercel" & "vercel login"
+35 - Seguir os passos e dar deploy no front
+36 - Converter de SQLite para MySQL(mudar .env, /config/database.ph etc)
+37 - Criar Dockerfile
+38 - Criar docker-entrypoint.sh
+39 - Configurar /public/.htaccess caso ele não exista
+40 - Criar render.yaml
+
