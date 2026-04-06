@@ -29,7 +29,7 @@ WORKDIR /var/www/html
 COPY . .
 
 # Criar arquivo .env se não existir (para produção)
-RUN if [ ! -f .env ]; then cp .env.example .env; fi
+#RUN if [ ! -f .env ]; then cp .env.example .env; fi #Linha problemática que deixei passar sem ver, não tenho .env.example
 
 # Instalar dependências PHP
 RUN composer install --no-dev --optimize-autoloader --no-interaction --ignore-platform-req=ext-exif
