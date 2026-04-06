@@ -1,29 +1,13 @@
 import axios from 'axios';
-
+const isProduction = import.meta.env.PROD; //Ver se estamos em ambiente de produção ou ñ
+const API_URL = isProduction
+    ? import.meta.env.VITE_API_URL || 'https://crud-ranhentos-idiomas.onrender.com/api'  : '/api';
 const api = axios.create({
-    baseURL: '/api',
+    baseURL: API_URL,
     headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
     },
-    timeout: 30000,
+    timeout: 30000, //30 segundos
 });
-
-// Interceptor para logging (útil para debug)
-api.interceptors.request.use(request => {
-    console.log(`API Request: ${request.method?.toUpperCase()} ${request.url}`, request.data);
-    return request;
-});
-
-api.interceptors.response.use(
-    response => {
-        console.log(`API Response: ${response.status} ${response.config.url}`, response.data);
-        return response;
-    },
-    error => {
-        console.error(`API Error:`, error.response?.status, error.response?.data || error.message);
-        return Promise.reject(error);
-    }
-);
-
 export default api;
