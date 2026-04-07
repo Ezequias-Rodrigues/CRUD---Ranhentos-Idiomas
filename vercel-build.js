@@ -1,6 +1,6 @@
-const { execSync } = require('child_process');
-const fs = require('fs');
-const path = require('path');
+const { execSync } = import('child_process');
+const fs = import('fs');
+const path = import('path');
 
 
 
