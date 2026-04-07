@@ -14,10 +14,7 @@
                 "Access-Control-Allow-Headers": "Content-Type, Authorization"
             }
         },
-        {
-            "src": "/(.*\\.php)",
-            "dest": "/404"
-        },
+       
         {
             "src": "/(.*)",
             "dest": "/index.html"
