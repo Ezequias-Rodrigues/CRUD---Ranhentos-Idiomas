@@ -3,15 +3,17 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
     plugins: [react()],
+    base: '/',
     build: {
         outDir: 'dist',
         emptyOutDir: true,
+        sourcemap: false,
         rollupOptions: {
             input: 'index.html',
             output: {
-                entryFileNames: 'main.js',
-                chunkFileNames: '[name].js',
-                assetFileNames: '[name].[ext]'
+                entryFileNames: 'assets/main.js',
+                chunkFileNames: 'assets/[name].js',
+                assetFileNames: 'assets/[name].[ext]'
             }
         }
     },
@@ -19,7 +21,8 @@ export default defineConfig({
         proxy: {
             '/api': {
                 target: 'https://crud-ranhentos-idiomas.onrender.com',
-                changeOrigin: true
+                changeOrigin: true,
+                secure: true
             }
         }
     }
