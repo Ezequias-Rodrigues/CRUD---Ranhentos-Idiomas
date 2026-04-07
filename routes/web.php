@@ -3,7 +3,11 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return response()->json([
+        'message' => 'Ranhentos Idiomas API',
+        'version' => '1.0',
+        'frontend' => 'https://crud-ranhentos-idiomas.vercel.app/'
+    ]);
 });
 Route::get('/debug-db', function() {
     try {
