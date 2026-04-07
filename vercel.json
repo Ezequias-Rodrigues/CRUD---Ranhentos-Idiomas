@@ -14,7 +14,7 @@
                 "Access-Control-Allow-Headers": "Content-Type, Authorization"
             }
         },
-       
+
         {
             "src": "/(.*)",
             "dest": "/index.html"
