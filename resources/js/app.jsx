@@ -1,5 +1,7 @@
+import './index.css'
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import StudentList from './components/StudentList';
@@ -23,20 +25,10 @@ function App() {
     );
 }
 
-// Tentar renderizar imediatamente
-const rootElement = document.getElementById('root');
-if (rootElement) {
-    ReactDOM.createRoot(rootElement).render(<App />);
-} else {
-    // Se não achou, aguardar o DOM
-    window.addEventListener('DOMContentLoaded', () => {
-        const root = document.getElementById('root');
-        if (root) {
-            ReactDOM.createRoot(root).render(<App />);
-        } else {
-            console.error('Root element not found');
-        }
-    });
-}
+ReactDOM.createRoot(document.getElementById('root')).render(
+    <React.StrictMode>
+        <App />
+    </React.StrictMode>
+);
 
 export default App;
