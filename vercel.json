@@ -4,11 +4,6 @@
     "outputDirectory": "public",
     "installCommand": "npm install",
     "framework": "vite",
-    "functions": {
-        "api/*": {
-            "runtime": "nodejs20.x"
-        }
-    },
     "routes": [
         {
             "src": "/api/(.*)",
