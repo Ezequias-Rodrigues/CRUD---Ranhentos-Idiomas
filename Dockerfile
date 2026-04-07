@@ -10,6 +10,9 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install pdo pdo_mysql zip \
     && update-ca-certificates
 
+# Configurar MySQL para usar SSL
+RUN echo "mysqlnd.ssl_verify_server_cert=0" >> /usr/local/etc/php/conf.d/docker-php-ext-mysql.ini
+RUN echo "mysqlnd.ssl_ca=/etc/ssl/certs/ca-certificates.crt" >> /usr/local/etc/php/conf.d/docker-php-ext-mysql.ini
 # Instalar Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
