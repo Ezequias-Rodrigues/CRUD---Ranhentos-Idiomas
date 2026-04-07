@@ -4,17 +4,12 @@ const path = import('path');
 
 
 
-// Garantir que a pasta dist existe
-if (!fs.existsSync('dist')) {
-    fs.mkdirSync('dist', { recursive: true });
-}
 
 // Executar build do Vite
 try {
     execSync('npx vite build', { stdio: 'inherit' });
 } catch (error) {
     console.error(' Erro no build:', error);
-    process.exit(1);
 }
 
 // Criar um index.html SIMPLES na pasta dist
