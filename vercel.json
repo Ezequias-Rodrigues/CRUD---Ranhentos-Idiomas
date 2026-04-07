@@ -1,7 +1,9 @@
 {
     "version": 2,
-    "buildCommand": "cd resources/js && npm run build",
-    "outputDirectory": "resources/js/dist",
+    "buildCommand": "npm run build",
+    "outputDirectory": "public",
+    "installCommand": "npm install",
+    "framework": "vite",
     "routes": [
         {
             "src": "/api/(.*)",

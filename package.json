@@ -11,7 +11,6 @@
     "devDependencies": {
         "@tailwindcss/vite": "^4.0.0",
         "autoprefixer": "^10.4.27",
-        "axios": ">=1.11.0 <=1.14.0",
         "concurrently": "^9.0.1",
         "laravel-vite-plugin": "^3.0.0",
         "postcss": "^8.5.8",
@@ -19,7 +18,9 @@
         "vite": "^8.0.0"
     },
     "dependencies": {
+        "axios": ">=1.11.0 <=1.14.0",
         "@heroicons/react": "^2.2.0",
+        "@vitejs/plugin-react": "^6.0.1",
         "chart.js": "^4.5.1",
         "react": "^19.2.4",
         "react-chartjs-2": "^5.3.1",

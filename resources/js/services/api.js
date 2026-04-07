@@ -1,7 +1,5 @@
 import axios from 'axios';
-const isProduction = import.meta.env.PROD; //Ver se estamos em ambiente de produção ou ñ
-const API_URL = isProduction
-    ? import.meta.env.VITE_API_URL || 'https://crud-ranhentos-idiomas.onrender.com/api'  : '/api';
+const API_URL = import.meta.env.VITE_API_URL || 'https://crud-ranhentos-idiomas.onrender.com/api';
 const api = axios.create({
     baseURL: API_URL,
     headers: {
