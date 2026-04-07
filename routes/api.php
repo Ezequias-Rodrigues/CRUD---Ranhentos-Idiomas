@@ -19,4 +19,4 @@ Route::get('enrollments/course/{courseId}', [EnrollmentController::class, 'getBy
 Route::get('reports/investment-per-student', [ReportController::class, 'investmentPerStudent']);
 Route::get('reports/popular-courses', [ReportController::class, 'popularCourses']);
 Route::get('reports/revenue-per-course', [ReportController::class, 'revenuePerCourse']);
-Route::get('reports/dashboard', [ReportController::class, 'dashboard']); // Bônus
+Route::get('reports/dashboard', [ReportController::class, 'dashboard']);
