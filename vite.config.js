@@ -6,13 +6,12 @@ export default defineConfig({
     build: {
         outDir: 'dist',
         emptyOutDir: true,
-        sourcemap: false,
         rollupOptions: {
-            input: 'resources/js/app.jsx',
+            input: 'index.html',
             output: {
-                entryFileNames: 'assets/main.js',
-                chunkFileNames: 'assets/[name].js',
-                assetFileNames: 'assets/[name].[ext]'
+                entryFileNames: 'main.js',
+                chunkFileNames: '[name].js',
+                assetFileNames: '[name].[ext]'
             }
         }
     },

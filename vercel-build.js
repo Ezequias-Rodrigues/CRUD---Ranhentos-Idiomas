@@ -1,17 +1,19 @@
 import { execSync } from 'child_process';
 import fs from 'fs';
 
-console.log('🔨 Iniciando build para Vercel...');
+console.log('🔨 Iniciando build...');
 
+// Executar build
 try {
-    // Executar build do Vite
     execSync('npx vite build', { stdio: 'inherit' });
 } catch (error) {
-    console.error('❌ Erro no build:', error);
+    console.error('Erro no build:', error);
 }
 
-// Criar index.html manualmente
-const html = `<!DOCTYPE html>
+// Verificar se o index.html foi criado na pasta dist
+if (!fs.existsSync('dist/index.html')) {
+    console.log('⚠️ index.html não encontrado, criando...');
+    const html = `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -23,9 +25,7 @@ const html = `<!DOCTYPE html>
     <script type="module" src="/assets/main.js"></script>
 </body>
 </html>`;
+    fs.writeFileSync('dist/index.html', html);
+}
 
-// Escrever o arquivo
-fs.writeFileSync('dist/index.html', html);
-console.log('✅ index.html criado');
-
-console.log('✅ Build finalizado');
+console.log('✅ Build concluído!');

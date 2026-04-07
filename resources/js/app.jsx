@@ -1,12 +1,11 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import ReactDOM from 'react-dom/client';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import StudentList from './components/StudentList';
-import CourseList from "./components/CourseList.jsx";
+import CourseList from './components/CourseList';
 import EnrollmentList from './components/EnrollmentList';
 import Reports from './components/Reports';
-
 
 function App() {
     return (
@@ -23,9 +22,21 @@ function App() {
         </Router>
     );
 }
-ReactDOM.createRoot(document.getElementById('app')).render(
-    <React.StrictMode>
-        <App />
-    </React.StrictMode>
-);
+
+// Tentar renderizar imediatamente
+const rootElement = document.getElementById('root');
+if (rootElement) {
+    ReactDOM.createRoot(rootElement).render(<App />);
+} else {
+    // Se não achou, aguardar o DOM
+    window.addEventListener('DOMContentLoaded', () => {
+        const root = document.getElementById('root');
+        if (root) {
+            ReactDOM.createRoot(root).render(<App />);
+        } else {
+            console.error('Root element not found');
+        }
+    });
+}
+
 export default App;
