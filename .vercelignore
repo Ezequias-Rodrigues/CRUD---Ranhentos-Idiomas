@@ -1,0 +1,15 @@
+# Ignorar arquivos PHP
+**/*.php
+app/
+bootstrap/
+config/
+database/
+routes/
+storage/
+vendor/
+
+# Ignorar arquivos do Laravel
+artisan
+server.php
+*.env
+*.env.*

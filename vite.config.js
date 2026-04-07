@@ -1,27 +1,30 @@
 import { defineConfig } from 'vite';
-import laravel from 'laravel-vite-plugin';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
-    plugins: [
-        laravel({
-            input: ['resources/css/app.css', 'resources/js/app.jsx'],
-            refresh: true,
-        }),
-        react(),
-    ],
+    plugins: [react()],
+    root: '.',
     build: {
-        outDir: 'public/build',
-        manifest: true,
+        outDir: 'public',
+        emptyOutDir: true,
         rollupOptions: {
-            input: 'resources/js/app.jsx',
-        },
+            input: {
+                main: 'resources/js/app.jsx'
+            },
+            output: {
+                entryFileNames: 'assets/[name].js',
+                chunkFileNames: 'assets/[name].js',
+                assetFileNames: 'assets/[name].[ext]'
+            }
+        }
     },
     server: {
-        watch: {
-            cors: true, //cors vive dando problema, espero que isso solucione
-            strictPort: false,
-            ignored: ['**/storage/framework/views/**'],
-        },
-    },
+        proxy: {
+            '/api': {
+                target: 'https://crud-ranhentos-idiomas.onrender.com',
+                changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/api/, '/api')
+            }
+        }
+    }
 });
