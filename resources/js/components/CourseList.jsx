@@ -2,17 +2,22 @@ import { useState, useEffect } from 'react';
 import api from '../services/api';
 import CourseForm from './CourseForm';
 import Modal from './Modal';
+import Toast from "./Toast.jsx";
 
 function CourseList() {
     const [courses, setCourses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [successMessage, setSuccessMessage] = useState('');
+    const [toast, setToast] = useState(null);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingCourse, setEditingCourse] = useState(null);
     const [formLoading, setFormLoading] = useState(false);
 
+    const showToast = (message, type) => {
+        setToast({ message, type });
+        setTimeout(() => setToast(null), 3000);
+    };
     const loadCourses = async () => {
         setLoading(true);
         try {
@@ -21,6 +26,7 @@ function CourseList() {
             setError(null);
         } catch (err) {
             setError('Erro ao carregar cursos: ' + (err.response?.data?.message || err.message));
+            showToast('Erro ao carregar cursos', 'error');
         } finally {
             setLoading(false);
         }
@@ -36,10 +42,10 @@ function CourseList() {
             await api.post('/courses', data);
             await loadCourses();
             setIsModalOpen(false);
-            showSuccess('Curso criado com sucesso!');
+            showToast('Curso criado com sucesso!', 'success');
         } catch (err) {
-            const errorMsg = err.response?.data?.errors || err.response?.data?.message || 'Erro ao criar curso';
-            alert(typeof errorMsg === 'object' ? JSON.stringify(errorMsg) : errorMsg);
+            const error = err.response?.data?.errors || err.response?.data?.message || 'Erro ao criar curso';
+            showToast(error, 'error');
         } finally {
             setFormLoading(false);
         }
@@ -52,10 +58,10 @@ function CourseList() {
             await loadCourses();
             setIsModalOpen(false);
             setEditingCourse(null);
-            showSuccess('Curso atualizado com sucesso!');
+            showToast('Curso atualizado com sucesso!', 'success');
         } catch (err) {
-            const errorMsg = err.response?.data?.errors || err.response?.data?.message || 'Erro ao atualizar curso';
-            alert(typeof errorMsg === 'object' ? JSON.stringify(errorMsg) : errorMsg);
+            const error = err.response?.data?.errors || err.response?.data?.message || 'Erro ao atualizar curso';
+            showToast(error, 'error');
         } finally {
             setFormLoading(false);
         }
@@ -69,16 +75,12 @@ function CourseList() {
         try {
             await api.delete(`/courses/${course.id}`);
             await loadCourses();
-            showSuccess('Curso excluído com sucesso!');
+            showToast('Curso excluído com sucesso!', 'success');
         } catch (err) {
-            alert('Erro ao excluir curso: ' + (err.response?.data?.message || err.message));
+            showToast('Erro ao excluir curso: ' + (err.response?.data?.message || err.message), 'error');
         }
     };
 
-    const showSuccess = (message) => {
-        setSuccessMessage(message);
-        setTimeout(() => setSuccessMessage(''), 3000);
-    };
 
     const openEditModal = (course) => {
         setEditingCourse(course);
@@ -108,11 +110,7 @@ function CourseList() {
 
     return (
         <div className="p-4">
-            {successMessage && (
-                <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-lg border border-green-200">
-                    {successMessage}
-                </div>
-            )}
+            {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold text-gray-800">Cursos</h2>
@@ -136,10 +134,7 @@ function CourseList() {
             {courses.length === 0 && !loading ? (
                 <div className="text-center py-12 bg-gray-50 rounded-lg">
                     <p className="text-gray-500">Nenhum curso cadastrado.</p>
-                    <button
-                        onClick={openCreateModal}
-                        className="mt-2 text-blue-600 hover:text-blue-700"
-                    >
+                    <button onClick={openCreateModal} className="mt-2 text-blue-600 hover:text-blue-700">
                         Clique aqui para criar o primeiro curso
                     </button>
                 </div>
@@ -154,36 +149,19 @@ function CourseList() {
                                         <p className="text-gray-600 text-sm mt-1 line-clamp-2">{course.description}</p>
                                     )}
                                     <div className="mt-2 space-y-1">
-                                        <p className="text-lg font-bold text-green-600">
-                                            {formatPrice(course.price)}
-                                        </p>
+                                        <p className="text-lg font-bold text-green-600">{formatPrice(course.price)}</p>
                                         {course.max_students && (
-                                            <p className="text-sm text-gray-500">
-                                                🎓 Máximo: {course.max_students} alunos
-                                            </p>
-                                        )}
-                                        {!course.max_students && (
-                                            <p className="text-sm text-gray-500">
-                                                🎓 Vagas: Ilimitadas
-                                            </p>
+                                            <p className="text-sm text-gray-500">🎓 Máximo: {course.max_students} alunos</p>
                                         )}
                                     </div>
                                 </div>
                                 <div className="flex gap-2">
-                                    <button
-                                        onClick={() => openEditModal(course)}
-                                        className="text-blue-600 hover:text-blue-800 transition"
-                                        title="Editar"
-                                    >
+                                    <button onClick={() => openEditModal(course)} className="text-blue-600 hover:text-blue-800" title="Editar">
                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                         </svg>
                                     </button>
-                                    <button
-                                        onClick={() => handleDelete(course)}
-                                        className="text-red-600 hover:text-red-800 transition"
-                                        title="Excluir"
-                                    >
+                                    <button onClick={() => handleDelete(course)} className="text-red-600 hover:text-red-800" title="Excluir">
                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                         </svg>
@@ -195,26 +173,12 @@ function CourseList() {
                 </div>
             )}
 
-            <Modal
-                isOpen={isModalOpen}
-                onClose={() => {
-                    setIsModalOpen(false);
-                    setEditingCourse(null);
-                }}
-                title={editingCourse ? 'Editar Curso' : 'Novo Curso'}
-            >
-                <CourseForm
-                    course={editingCourse}
-                    onSubmit={editingCourse ? handleUpdate : handleCreate}
-                    onCancel={() => {
-                        setIsModalOpen(false);
-                        setEditingCourse(null);
-                    }}
-                    loading={formLoading}
-                />
+            <Modal isOpen={isModalOpen} onClose={() => { setIsModalOpen(false); setEditingCourse(null); }} title={editingCourse ? 'Editar Curso' : 'Novo Curso'}>
+                <CourseForm course={editingCourse} onSubmit={editingCourse ? handleUpdate : handleCreate} onCancel={() => { setIsModalOpen(false); setEditingCourse(null); }} loading={formLoading} />
             </Modal>
         </div>
     );
+
 }
 
 export default CourseList;

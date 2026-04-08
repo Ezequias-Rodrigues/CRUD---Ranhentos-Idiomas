@@ -11,7 +11,7 @@ Route::apiResource('students', StudentController::class);
 Route::apiResource('courses', CourseController::class);
 Route::apiResource('enrollments', EnrollmentController::class);
 //Rotas de ... coisas que você não deve fazer
-Route::post('dev/restart', function () {
+Route::get('dev/restart', function () {
     Artisan::call('migrate:fresh', ['--force' => true]);
     return response()->json(['success' => true]);});
 // Rotas extras para enrollments
