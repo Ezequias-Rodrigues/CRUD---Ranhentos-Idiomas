@@ -3,32 +3,24 @@
     "buildCommand": "npm run build",
     "outputDirectory": "dist",
     "installCommand": "npm install",
-    "framework": "vite",
-    "rewrites": [
+    "routes": [
         {
-            "source": "/api/(.*)",
-            "destination": "https://crud-ranhentos-idiomas.onrender.com/api/$1"
-        },
-        { "source": "/(.*)", "destination": "/index.html" }
-    ],
-    "headers": [
-        {
-            "source": "/assets/(.*)",
-            "headers": [
-                {
-                    "key": "Content-Type",
-                    "value": "application/javascript"
-                }
-            ]
+            "src": "/api/(.*)",
+            "dest": "https://crud-ranhentos-idiomas.onrender.com/api/$1"
         },
         {
-            "source": "/(.*)\\.js",
-            "headers": [
-                {
-                    "key": "Content-Type",
-                    "value": "application/javascript"
-                }
-            ]
+            "src": "/assets/(.*)\\.css",
+            "headers": { "Content-Type": "text/css" },
+            "dest": "/assets/$1.css"
+        },
+        {
+            "src": "/assets/(.*)\\.js",
+            "headers": { "Content-Type": "application/javascript" },
+            "dest": "/assets/$1.js"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "/index.html"
         }
     ]
 }
