@@ -135,7 +135,7 @@ function CourseList() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <h2 className="text-2xl font-bold text-gray-800">Cursos</h2>
             <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                {/* Barra de pesquisa - AQUI ESTÁ O COMPONENTE */}
+
                 <SearchBar
                     onSearch={handleSearch}
                     placeholder="Pesquisar por nome do curso..."
@@ -180,11 +180,15 @@ function CourseList() {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {filteredCourses.map(course => (
                     <div key={course.id} className="bg-white rounded-lg shadow-md border border-gray-200 p-4 hover:shadow-lg transition">
-                        <div className="flex justify-between items-start">
-                            <div className="flex-1">
-                                <h3 className="font-semibold text-lg text-gray-800">{course.name}</h3>
+                        <div className="flex justify-between items-start gap-2">
+                            <div className="flex-1 min-w-0">
+                                <h3 className="font-semibold text-lg text-gray-800 break-words">
+                                    {course.name}
+                                </h3>
                                 {course.description && (
-                                    <p className="text-gray-600 text-sm mt-1 line-clamp-2">{course.description}</p>
+                                    <p className="text-gray-600 text-sm mt-1 line-clamp-2 break-words">
+                                        {course.description}
+                                    </p>
                                 )}
                                 <div className="mt-2 space-y-1">
                                     <p className="text-lg font-bold text-green-600">{formatPrice(course.price)}</p>
@@ -196,13 +200,13 @@ function CourseList() {
                                     )}
                                 </div>
                             </div>
-                            <div className="flex gap-2">
-                                <button onClick={() => openEditModal(course)} className="text-blue-600 hover:text-blue-800" title="Editar">
+                            <div className="flex gap-2 flex-shrink-0">
+                                <button onClick={() => openEditModal(course)} className="text-blue-600 hover:text-blue-800 transition p-1" title="Editar">
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                     </svg>
                                 </button>
-                                <button onClick={() => handleDelete(course)} className="text-red-600 hover:text-red-800" title="Excluir">
+                                <button onClick={() => handleDelete(course)} className="text-red-600 hover:text-red-800 transition p-1" title="Excluir">
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                     </svg>

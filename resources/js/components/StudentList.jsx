@@ -62,7 +62,6 @@ function StudentList() {
             await api.post('/students', data);
             await loadStudents();
             setIsModalOpen(false);
-            showSuccess('Aluno criado com sucesso!');
             showToast('Aluno criado com sucesso!', 'success');
         } catch (err) {
             const error = err.response?.data?.errors || err.response?.data?.message || 'Erro ao criar aluno';
@@ -80,7 +79,6 @@ function StudentList() {
             await loadStudents();
             setIsModalOpen(false);
             setEditingStudent(null);
-            showSuccess('Aluno atualizado com sucesso!');
             showToast('Aluno atualizado com sucesso!', 'success');
         } catch (err) {
             const error = err.response?.data?.errors || err.response?.data?.message || 'Erro ao atualizar aluno';
@@ -105,11 +103,6 @@ function StudentList() {
         }
     };
 
-    // Mostrar mensagem de sucesso
-    const showSuccess = (message) => {
-        setSuccessMessage(message);
-        setTimeout(() => setSuccessMessage(''), 3000);
-    };
 
     // Abrir modal para editar
     const openEditModal = (student) => {
@@ -182,19 +175,31 @@ function StudentList() {
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {filteredStudents.map(student => (
                         <div key={student.id} className="bg-white rounded-lg shadow-md border border-gray-200 p-4 hover:shadow-lg transition">
-                            <div className="flex justify-between items-start">
-                                <div className="flex-1">
-                                    <h3 className="font-semibold text-lg text-gray-800">{student.name}</h3>
-                                    <p className="text-gray-600 text-sm mt-1">{student.email}</p>
-                                    {student.phone && <p className="text-gray-500 text-sm mt-1">{student.phone}</p>}
+                            <div className="flex justify-between items-start gap-2">
+                                <div className="flex-1 min-w-0"> {/*  min-w-0 pra truncar */}
+                                    <h3 className="font-semibold text-lg text-gray-800 break-words"> { /*break words */}
+                                        {student.name}
+                                    </h3>
+                                    <p className="text-gray-600 text-sm mt-1 break-words">{student.email}</p>
+                                    {student.phone && (
+                                        <p className="text-gray-500 text-sm mt-1 break-words">{student.phone}</p>
+                                    )}
                                 </div>
-                                <div className="flex gap-2">
-                                    <button onClick={() => openEditModal(student)} className="text-blue-600 hover:text-blue-800" title="Editar">
+                                <div className="flex gap-2 flex-shrink-0"> {}
+                                    <button
+                                        onClick={() => openEditModal(student)}
+                                        className="text-blue-600 hover:text-blue-800 transition p-1"
+                                        title="Editar"
+                                    >
                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                         </svg>
                                     </button>
-                                    <button onClick={() => handleDelete(student)} className="text-red-600 hover:text-red-800" title="Excluir">
+                                    <button
+                                        onClick={() => handleDelete(student)}
+                                        className="text-red-600 hover:text-red-800 transition p-1"
+                                        title="Excluir"
+                                    >
                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                         </svg>

@@ -6,7 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Ranhentos Idiomas</title>
     @viteReactRefresh
-    @vite(['resources/css/app.css', 'resources/js/app.jsx'])
+    @vite([ 'resources/js/app.jsx'])
 </head>
 <body>
 <div id="app"></div>

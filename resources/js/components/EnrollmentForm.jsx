@@ -13,10 +13,15 @@ function EnrollmentForm({ enrollment, students, courses, onSubmit, onCancel, loa
 
     useEffect(() => {
         if (enrollment) {
-            setFormData({
+            const date = new Date(enrollment.start_date);
+            const year = date.getFullYear();
+            const month = pad(date.getMonth() + 1);
+            const day = pad(date.getDate());
+            const formatted_date = `${year}-${month}-${day}`;
+          setFormData({
                 student_id: enrollment.student_id || '',
                 course_id: enrollment.course_id || '',
-                start_date: enrollment.start_date || '',
+                start_date: formatted_date || '',
                 price_paid: enrollment.price_paid || '',
                 status: enrollment.status || 'active'
             });
@@ -26,11 +31,12 @@ function EnrollmentForm({ enrollment, students, courses, onSubmit, onCancel, loa
         }
     }, [enrollment, courses]);
 
+    function pad(number) {
+        return number < 10 ? `0${number}` : number;
+    }
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
-
-        // Limpar erro do campo
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: '' }));
         }
@@ -73,10 +79,12 @@ function EnrollmentForm({ enrollment, students, courses, onSubmit, onCancel, loa
 
     // Formatar preço para exibição
     const formatPrice = (price) => {
+
         return new Intl.NumberFormat('pt-BR', {
             style: 'currency',
             currency: 'BRL'
         }).format(price);
+
     };
 
     return (
