@@ -3,6 +3,7 @@ import api from '../services/api';
 import EnrollmentForm from './EnrollmentForm';
 import Modal from './Modal';
 import Toast from "./Toast.jsx";
+import SearchBar from "./SearchBar.jsx";
 
 function EnrollmentList() {
     const [enrollments, setEnrollments] = useState([]);
@@ -11,6 +12,8 @@ function EnrollmentList() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [toast, setToast] = useState(null);
+    const [filteredEnrollments, setFilteredEnrollments] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingEnrollment, setEditingEnrollment] = useState(null);
@@ -19,6 +22,21 @@ function EnrollmentList() {
     const showToast = (message, type) => {
         setToast({ message, type });
         setTimeout(() => setToast(null), 3000);
+    };
+
+    const handleSearch = (term) => {
+        setSearchTerm(term);
+        if (!term.trim()) {
+            setFilteredEnrollments(enrollments);
+            return;
+        }
+
+        const lowercasedTerm = term.toLowerCase();
+        const filtered = enrollments.filter(enrollment =>
+            enrollment.student?.name?.toLowerCase().includes(lowercasedTerm) ||
+            enrollment.course?.name?.toLowerCase().includes(lowercasedTerm)
+        );
+        setFilteredEnrollments(filtered);
     };
     // Carregar todos os dados necessários
     const loadData = async () => {
@@ -31,6 +49,7 @@ function EnrollmentList() {
             ]);
 
             setEnrollments(enrollmentsRes.data.data || enrollmentsRes.data);
+            setFilteredEnrollments(enrollmentsRes.data.data || enrollmentsRes.data);
             setStudents(studentsRes.data);
             setCourses(coursesRes.data);
             setError(null);
@@ -149,7 +168,7 @@ function EnrollmentList() {
     return (
         <div className="p-4">
             {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
-
+            <SearchBar onSearch={handleSearch} placeholder="Pesquisar por aluno ou curso..." className="w-full sm:w-80" />
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold text-gray-800">Matrículas</h2>
                 <button onClick={openCreateModal} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
@@ -181,7 +200,7 @@ function EnrollmentList() {
                         </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
-                        {enrollments.map(enrollment => (
+                        {filteredEnrollments.map(enrollment => (
                             <tr key={enrollment.id} className="hover:bg-gray-50">
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{enrollment.student?.name || 'N/A'}</td>
                                 <td className="px-6 py-4 text-sm text-gray-900">{enrollment.course?.name || 'N/A'}</td>
