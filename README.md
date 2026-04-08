@@ -128,7 +128,7 @@ Saída em `dist/` (configurado no `vite.config.js`).
 | **Laravel 13** | Framework PHP: rotas API, Eloquent ORM, migrações, validação, CORS, testes |
 | **PHP 8.4** | Runtime do servidor e da CLI Artisan |
 | **Laravel Sanctum** | Pacote incluído para autenticação API/token (base do ecossistema Laravel API) |
-| **SQLite / MySQL / PostgreSQL** | Persistência via camada PDO (`config/database.php`) |
+| **SQLite / MySQL** | Persistência via camada PDO (`config/database.php`) |
 | **React 18** | Interface em componentes funcionais |
 | **Vite 5** | Bundler e servidor de desenvolvimento com HMR |
 | **React Router 6** | Navegação entre telas (alunos, cursos, matrículas, relatórios) |
@@ -137,7 +137,7 @@ Saída em `dist/` (configurado no `vite.config.js`).
 | **Chart.js + react-chartjs-2** | Gráficos nos relatórios |
 | **@heroicons/react** | Ícones na UI |
 | **PHPUnit 12** | Testes de feature/unit em `tests/` |
-| **Faker / Factories** | Dados fictícios para seeds e testes |
+| **Factories** | Dados fictícios para seeds e testes |
 
 ---
 
