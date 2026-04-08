@@ -13,12 +13,13 @@ return new class extends Migration
     {
         Schema::create('courses', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('name', 255);
             $table->text('description')->nullable();
             $table->integer("duration")->nullable(); #Penso em por a duração em semestres por questão de simplicidade, já que é uma escola de idiomas, não é para haver nenhum curso com menos de 1 ano
             $table->decimal('price', 10, 2);
             $table->integer('max_students')->nullable();
-            $table->timestamps();
+            $table->timestamp('created_at')->nullable()->default(null)->change();
+            $table->timestamp('updated_at')->nullable()->default(null)->change();
         });
     }
 

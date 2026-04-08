@@ -2,18 +2,23 @@ import { useState, useEffect } from 'react';
 import api from '../services/api';
 import StudentForm from './StudentForm';
 import Modal from './Modal';
+import Toast from "./Toast.jsx";
 
 function StudentList() {
     const [students, setStudents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [successMessage, setSuccessMessage] = useState('');
+    const [toast, setToast] = useState(null);
 
     // Estados do modal
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingStudent, setEditingStudent] = useState(null);
     const [formLoading, setFormLoading] = useState(false);
 
+    const showToast = (message, type) => {
+        setToast({ message, type });
+        setTimeout(() => setToast(null), 3000);
+    };
     // Carregar alunos
     const loadStudents = async () => {
         setLoading(true);
@@ -23,6 +28,7 @@ function StudentList() {
             setError(null);
         } catch (err) {
             setError('Erro ao carregar alunos: ' + (err.response?.data?.message || err.message));
+            showToast('Erro ao carregar alunos', 'error')
         } finally {
             setLoading(false);
         }
@@ -40,9 +46,10 @@ function StudentList() {
             await loadStudents();
             setIsModalOpen(false);
             showSuccess('Aluno criado com sucesso!');
+            showToast('Aluno criado com sucesso!', 'success');
         } catch (err) {
-            const errorMsg = err.response?.data?.errors || err.response?.data?.message || 'Erro ao criar aluno';
-            alert(typeof errorMsg === 'object' ? JSON.stringify(errorMsg) : errorMsg);
+            const error = err.response?.data?.errors || err.response?.data?.message || 'Erro ao criar aluno';
+            showToast(error, 'error');
         } finally {
             setFormLoading(false);
         }
@@ -57,9 +64,10 @@ function StudentList() {
             setIsModalOpen(false);
             setEditingStudent(null);
             showSuccess('Aluno atualizado com sucesso!');
+            showToast('Aluno atualizado com sucesso!', 'success');
         } catch (err) {
-            const errorMsg = err.response?.data?.errors || err.response?.data?.message || 'Erro ao atualizar aluno';
-            alert(typeof errorMsg === 'object' ? JSON.stringify(errorMsg) : errorMsg);
+            const error = err.response?.data?.errors || err.response?.data?.message || 'Erro ao atualizar aluno';
+            showToast(error, 'error');
         } finally {
             setFormLoading(false);
         }
@@ -74,9 +82,9 @@ function StudentList() {
         try {
             await api.delete(`/students/${student.id}`);
             await loadStudents();
-            showSuccess('Aluno excluído com sucesso!');
+            showToast('Aluno excluído com sucesso!', 'success');
         } catch (err) {
-            alert('Erro ao excluir aluno: ' + (err.response?.data?.message || err.message));
+            showToast('Erro ao excluir aluno', 'error');
         }
     };
 
@@ -108,12 +116,9 @@ function StudentList() {
 
     return (
         <div className="p-4">
+            {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
             {/* Mensagem de sucesso */}
-            {successMessage && (
-                <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-lg border border-green-200">
-                    {successMessage}
-                </div>
-            )}
+
 
             {/* Header */}
             <div className="flex justify-between items-center mb-6">

@@ -14,11 +14,12 @@ return new class extends Migration
         Schema::create('enrollments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('student_id')->constrained()->onDelete('cascade'); //Foreign key para o id do estudante
-            $table->foreignId('course_id')->constrained()->onDelete('cascade'); // foregin key para o id do curso. A ideia é "matricula é a relação estudante-curso"
+            $table->foreignId('course_id')->constrained()->onDelete('cascade'); // foreign key para o id do curso. A ideia é "matricula é a relação estudante-curso"
             $table->date('start_date');
             $table->decimal('price_paid', 10, 2);#Decimal de até 10 digitos, com 2 casas decimais. Decimais tem precisão maior do que float, então dinheiro = decimal
             $table->enum('status', ['active', 'cancelled', 'completed'])->default('active');//Enuns? Interessante...
-            $table->timestamps();
+            $table->timestamp('created_at')->nullable()->default(null)->change();
+            $table->timestamp('updated_at')->nullable()->default(null)->change();
         });
     }
 

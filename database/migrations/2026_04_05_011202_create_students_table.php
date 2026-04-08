@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('students', function (Blueprint $table) { //Aparentemente não iremos usar SQL
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->string('phone')->nullable();
-            $table->timestamps();
+            $table->string('name',255);
+            $table->string('email',255)->unique();
+            $table->string('phone',15)->nullable();
+            $table->timestamp('created_at')->nullable()->default(null)->change();
+            $table->timestamp('updated_at')->nullable()->default(null)->change();
         });
     }
 
