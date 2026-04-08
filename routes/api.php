@@ -14,6 +14,9 @@ Route::apiResource('enrollments', EnrollmentController::class);
 Route::get('dev/restart', function () {
     Artisan::call('migrate:fresh', ['--force' => true]);
     return response()->json(['success' => true]);});
+Route::get('dev/seed', function () {
+    Artisan::call('db:seed', ['--force' => true]);
+    return response()->json(['success' => true]);});
 // Rotas extras para enrollments
 Route::get('enrollments/student/{studentId}', [EnrollmentController::class, 'getByStudent']);
 Route::get('enrollments/course/{courseId}', [EnrollmentController::class, 'getByCourse']);

@@ -18,8 +18,8 @@ return new class extends Migration
             $table->date('start_date');
             $table->decimal('price_paid', 10, 2);#Decimal de até 10 digitos, com 2 casas decimais. Decimais tem precisão maior do que float, então dinheiro = decimal
             $table->enum('status', ['active', 'cancelled', 'completed'])->default('active');//Enuns? Interessante...
-            $table->timestamp('created_at')->nullable()->default(null)->change();
-            $table->timestamp('updated_at')->nullable()->default(null)->change();
+            $table->timestamps();
+           // $table->timestamp('updated_at')->nullable()->default(null)->change();
         });
     }
 

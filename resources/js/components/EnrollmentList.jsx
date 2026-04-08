@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../services/api';
 import EnrollmentForm from './EnrollmentForm';
 import Modal from './Modal';
+import Toast from "./Toast.jsx";
 
 function EnrollmentList() {
     const [enrollments, setEnrollments] = useState([]);
@@ -9,12 +10,16 @@ function EnrollmentList() {
     const [courses, setCourses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [successMessage, setSuccessMessage] = useState('');
+    const [toast, setToast] = useState(null);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingEnrollment, setEditingEnrollment] = useState(null);
     const [formLoading, setFormLoading] = useState(false);
 
+    const showToast = (message, type) => {
+        setToast({ message, type });
+        setTimeout(() => setToast(null), 3000);
+    };
     // Carregar todos os dados necessários
     const loadData = async () => {
         setLoading(true);
@@ -31,6 +36,7 @@ function EnrollmentList() {
             setError(null);
         } catch (err) {
             setError('Erro ao carregar dados: ' + (err.response?.data?.message || err.message));
+            showToast('Erro ao carregar dados', 'error');
         } finally {
             setLoading(false);
         }
@@ -46,10 +52,10 @@ function EnrollmentList() {
             await api.post('/enrollments', data);
             await loadData();
             setIsModalOpen(false);
-            showSuccess('Matrícula realizada com sucesso!');
+            showToast('Matrícula realizada com sucesso!', 'success');
         } catch (err) {
-            const errorMsg = err.response?.data?.message || err.response?.data?.errors || 'Erro ao criar matrícula';
-            alert(typeof errorMsg === 'object' ? JSON.stringify(errorMsg) : errorMsg);
+            const error = err.response?.data?.message || err.response?.data?.errors || 'Erro ao criar matrícula';
+            showToast(typeof error === 'object' ? JSON.stringify(error) : error, "error");
         } finally {
             setFormLoading(false);
         }
@@ -64,8 +70,8 @@ function EnrollmentList() {
             setEditingEnrollment(null);
             showSuccess('Matrícula atualizada com sucesso!');
         } catch (err) {
-            const errorMsg = err.response?.data?.message || err.response?.data?.errors || 'Erro ao atualizar matrícula';
-            alert(typeof errorMsg === 'object' ? JSON.stringify(errorMsg) : errorMsg);
+            const error = err.response?.data?.message || err.response?.data?.errors || 'Erro ao atualizar matrícula';
+            showToast(typeof error === 'object' ? JSON.stringify(error) : error, 'error');
         } finally {
             setFormLoading(false);
         }
@@ -82,9 +88,9 @@ function EnrollmentList() {
         try {
             await api.delete(`/enrollments/${enrollment.id}`);
             await loadData();
-            showSuccess('Matrícula removida com sucesso!');
+            showToast('Matrícula removida com sucesso!', 'success');
         } catch (err) {
-            alert('Erro ao remover matrícula: ' + (err.response?.data?.message || err.message));
+            showToast('Erro ao remover matrícula: ' + (err.response?.data?.message || err.message), 'error');
         }
     };
 
@@ -142,18 +148,11 @@ function EnrollmentList() {
 
     return (
         <div className="p-4">
-            {successMessage && (
-                <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-lg border border-green-200">
-                    {successMessage}
-                </div>
-            )}
+            {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold text-gray-800">Matrículas</h2>
-                <button
-                    onClick={openCreateModal}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
-                >
+                <button onClick={openCreateModal} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                     </svg>
@@ -161,82 +160,42 @@ function EnrollmentList() {
                 </button>
             </div>
 
-            {error && (
-                <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg border border-red-200">
-                    {error}
-                </div>
-            )}
+            {error && <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">{error}</div>}
 
             {enrollments.length === 0 && !loading ? (
                 <div className="text-center py-12 bg-gray-50 rounded-lg">
                     <p className="text-gray-500">Nenhuma matrícula cadastrada.</p>
-                    <button
-                        onClick={openCreateModal}
-                        className="mt-2 text-blue-600 hover:text-blue-700"
-                    >
-                        Clique aqui para criar a primeira matrícula
-                    </button>
+                    <button onClick={openCreateModal} className="mt-2 text-blue-600 hover:text-blue-700">Criar primeira matrícula</button>
                 </div>
             ) : (
                 <div className="overflow-x-auto">
                     <table className="min-w-full bg-white rounded-lg overflow-hidden">
                         <thead className="bg-gray-100">
                         <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aluno</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Curso</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Início</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor Pago</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500">Aluno</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500">Curso</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500">Início</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500">Valor</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500">Status</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500">Ações</th>
                         </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
                         {enrollments.map(enrollment => (
                             <tr key={enrollment.id} className="hover:bg-gray-50">
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm font-medium text-gray-900">
-                                        {enrollment.student?.name || 'N/A'}
-                                    </div>
-                                    <div className="text-sm text-gray-500">
-                                        {enrollment.student?.email || ''}
-                                    </div>
-                                </td>
-                                <td className="px-6 py-4">
-                                    <div className="text-sm text-gray-900">
-                                        {enrollment.course?.name || 'N/A'}
-                                    </div>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm text-gray-900">
-                                        {formatDate(enrollment.start_date)}
-                                    </div>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm font-semibold text-green-600">
-                                        {formatPrice(enrollment.price_paid)}
-                                    </div>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                        <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(enrollment.status)}`}>
-                                            {getStatusText(enrollment.status)}
-                                        </span>
-                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{enrollment.student?.name || 'N/A'}</td>
+                                <td className="px-6 py-4 text-sm text-gray-900">{enrollment.course?.name || 'N/A'}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatDate(enrollment.start_date)}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">{formatPrice(enrollment.price_paid)}</td>
+                                <td className="px-6 py-4 whitespace-nowrap"><span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(enrollment.status)}`}>{getStatusText(enrollment.status)}</span></td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <div className="flex gap-2">
-                                        <button
-                                            onClick={() => openEditModal(enrollment)}
-                                            className="text-blue-600 hover:text-blue-900"
-                                            title="Editar"
-                                        >
+                                        <button onClick={() => openEditModal(enrollment)} className="text-blue-600 hover:text-blue-900" title="Editar">
                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                             </svg>
                                         </button>
-                                        <button
-                                            onClick={() => handleDelete(enrollment)}
-                                            className="text-red-600 hover:text-red-900"
-                                            title="Excluir"
-                                        >
+                                        <button onClick={() => handleDelete(enrollment)} className="text-red-600 hover:text-red-900" title="Excluir">
                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                             </svg>
@@ -250,28 +209,10 @@ function EnrollmentList() {
                 </div>
             )}
 
-            <Modal
-                isOpen={isModalOpen}
-                onClose={() => {
-                    setIsModalOpen(false);
-                    setEditingEnrollment(null);
-                }}
-                title={editingEnrollment ? 'Editar Matrícula' : 'Nova Matrícula'}
-            >
-                <EnrollmentForm
-                    enrollment={editingEnrollment}
-                    students={students}
-                    courses={courses}
-                    onSubmit={editingEnrollment ? handleUpdate : handleCreate}
-                    onCancel={() => {
-                        setIsModalOpen(false);
-                        setEditingEnrollment(null);
-                    }}
-                    loading={formLoading}
-                />
+            <Modal isOpen={isModalOpen} onClose={() => { setIsModalOpen(false); setEditingEnrollment(null); }} title={editingEnrollment ? 'Editar Matrícula' : 'Nova Matrícula'}>
+                <EnrollmentForm enrollment={editingEnrollment} students={students} courses={courses} onSubmit={editingEnrollment ? handleUpdate : handleCreate} onCancel={() => { setIsModalOpen(false); setEditingEnrollment(null); }} loading={formLoading} />
             </Modal>
         </div>
     );
 }
-
 export default EnrollmentList;
